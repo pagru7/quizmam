@@ -1,0 +1,14 @@
+services:
+  quizmam:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: quizmam
+    ports:
+      - "8080:8080"
+    volumes:
+      - quizmam-data:/data
+    restart: unless-stopped
+
+volumes:
+  quizmam-data:

@@ -1,0 +1,32 @@
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vs/
+*.user
+*.suo
+
+# .NET build output
+**/bin/
+**/obj/
+**/TestResults/
+
+# Frontend build/deps
+**/node_modules/
+src/Quizmam.Api/ClientApp/dist/
+
+# Runtime/generated assets
+src/Quizmam.Api/wwwroot/
+src/Quizmam.Api/publish-test/
+
+# SQLite/runtime data
+*.db
+*.db-shm
+*.db-wal
+/data/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

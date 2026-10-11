@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Quizmam.Api/Quizmam.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Quizmam.Api.Tests/Quizmam.Api.Tests.csproj" />
+  </Folder>
+</Solution>
