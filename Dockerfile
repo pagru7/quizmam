@@ -1,11 +1,15 @@
-FROM node:22-bookworm-slim AS frontend-build
+FROM node:20-bookworm-slim AS frontend-build
 WORKDIR /src/client
+ENV NPM_CONFIG_CACHE=/tmp/.npm \
+    NPM_CONFIG_UPDATE_NOTIFIER=false \
+    NPM_CONFIG_FUND=false \
+    NPM_CONFIG_AUDIT=false
 COPY src/Quizmam.Api/ClientApp/package*.json ./
-RUN npm install -g npm@10
+RUN npm install -g npm@11.18.0
 RUN npm --version && node --version
-RUN npm ci --no-audit --no-fund --cache /tmp/.npm --prefer-offline \
-  || (echo "npm ci failed, dumping logs..." \
-  && find /tmp/.npm -type f -name "*.log" -maxdepth 5 -print -exec cat {} \; \
+RUN npm install --include=dev --prefer-offline \
+  || (echo "npm install failed, dumping logs..." \
+  && find /tmp/.npm /root/.npm -maxdepth 8 -type f -name "*.log" -print -exec cat {} \; 2>/dev/null \
   && exit 1)
 COPY src/Quizmam.Api/ClientApp/ ./
 RUN npm run build
