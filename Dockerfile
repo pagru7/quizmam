@@ -13,8 +13,8 @@ RUN dotnet publish ./src/Quizmam.Api/Quizmam.Api.csproj -c Release -p:SkipClient
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
 WORKDIR /app
-ENV ASPNETCORE_URLS=http://0.0.0.0:8080
-EXPOSE 8080
+ENV ASPNETCORE_URLS=http://0.0.0.0:8081
+EXPOSE 8081
 VOLUME ["/data"]
 COPY --from=backend-build /app/publish .
 ENTRYPOINT ["dotnet", "Quizmam.Api.dll"]
