@@ -3,9 +3,13 @@ WORKDIR /src/client
 ENV NPM_CONFIG_CACHE=/tmp/.npm \
     NPM_CONFIG_UPDATE_NOTIFIER=false \
     NPM_CONFIG_FUND=false \
-    NPM_CONFIG_AUDIT=false
+    NPM_CONFIG_AUDIT=false \
+    NPM_CONFIG_FETCH_RETRIES=5 \
+    NPM_CONFIG_FETCH_RETRY_FACTOR=2 \
+    NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000 \
+    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000 \
+    NPM_CONFIG_REGISTRY=https://registry.npmjs.org/
 COPY src/Quizmam.Api/ClientApp/package*.json ./
-RUN npm install -g npm@11.18.0
 RUN npm --version && node --version
 RUN npm install --include=dev --prefer-offline \
   || (echo "npm install failed, dumping logs..." \
