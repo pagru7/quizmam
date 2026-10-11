@@ -1,7 +1,12 @@
 FROM node:22-bookworm-slim AS frontend-build
 WORKDIR /src/client
 COPY src/Quizmam.Api/ClientApp/package*.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm install -g npm@10
+RUN npm --version && node --version
+RUN npm ci --no-audit --no-fund --cache /tmp/.npm --prefer-offline \
+  || (echo "npm ci failed, dumping logs..." \
+  && find /tmp/.npm -type f -name "*.log" -maxdepth 5 -print -exec cat {} \; \
+  && exit 1)
 COPY src/Quizmam.Api/ClientApp/ ./
 RUN npm run build
 
