@@ -1,23 +1,16 @@
 FROM node:20-bookworm-slim AS frontend-build
-WORKDIR /src/client
-ENV NPM_CONFIG_CACHE=/tmp/.npm \
-    NPM_CONFIG_UPDATE_NOTIFIER=false \
-    NPM_CONFIG_FUND=false \
-    NPM_CONFIG_AUDIT=false \
-    NPM_CONFIG_FETCH_RETRIES=5 \
-    NPM_CONFIG_FETCH_RETRY_FACTOR=2 \
-    NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000 \
-    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000 \
-    NPM_CONFIG_REGISTRY=https://registry.npmjs.org/
+WORKDIR /src/Quizmam.Api/ClientApp
+
 COPY src/Quizmam.Api/ClientApp/package*.json ./
-RUN npm install --include=dev --no-audit --no-fund --loglevel=error
+RUN npm ci --include=dev --no-audit --no-fund
+
 COPY src/Quizmam.Api/ClientApp/ ./
 RUN npm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend-build
 WORKDIR /src
 COPY . .
-COPY --from=frontend-build /src/client/dist ./src/Quizmam.Api/wwwroot
+COPY --from=frontend-build /src/Quizmam.Api/ClientApp/dist ./src/Quizmam.Api/wwwroot
 RUN dotnet publish ./src/Quizmam.Api/Quizmam.Api.csproj -c Release -p:SkipClientBuild=true -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
