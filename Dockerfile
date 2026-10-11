@@ -10,11 +10,7 @@ ENV NPM_CONFIG_CACHE=/tmp/.npm \
     NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000 \
     NPM_CONFIG_REGISTRY=https://registry.npmjs.org/
 COPY src/Quizmam.Api/ClientApp/package*.json ./
-RUN npm --version && node --version
-RUN npm install --include=dev --prefer-offline \
-  || (echo "npm install failed, dumping logs..." \
-  && find /tmp/.npm /root/.npm -maxdepth 8 -type f -name "*.log" -print -exec cat {} \; 2>/dev/null \
-  && exit 1)
+RUN npm install --include=dev --no-audit --no-fund --loglevel=error
 COPY src/Quizmam.Api/ClientApp/ ./
 RUN npm run build
 
