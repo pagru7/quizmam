@@ -1,7 +1,7 @@
-FROM node:22-alpine AS frontend-build
+FROM node:22-bookworm-slim AS frontend-build
 WORKDIR /src/client
 COPY src/Quizmam.Api/ClientApp/package*.json ./
-RUN npm ci
+RUN npm ci --no-audit --no-fund
 COPY src/Quizmam.Api/ClientApp/ ./
 RUN npm run build
 
