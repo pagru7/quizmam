@@ -1,9 +1,13 @@
-FROM node:22-bookworm-slim AS frontend-build
+FROM node:22.12.0-bookworm-slim AS frontend-build
 WORKDIR /src
 
 COPY src/Quizmam.Api/ClientApp/package*.json ./Quizmam.Api/ClientApp/
 WORKDIR /src/Quizmam.Api/ClientApp
-RUN npm install --include=dev --no-audit --no-fund
+RUN npm ci --include=dev --no-audit --no-fund \
+  || (echo "npm install failed; dumping npm logs" \
+  && ls -la /root/.npm/_logs \
+  && cat /root/.npm/_logs/*-debug-0.log \
+  && false)
 
 COPY src/Quizmam.Api/ClientApp/ ./
 RUN npm run build
