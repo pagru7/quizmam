@@ -3,7 +3,7 @@ WORKDIR /src
 
 COPY src/Quizmam.Api/ClientApp/package*.json ./src/Quizmam.Api/ClientApp/
 WORKDIR /src/Quizmam.Api/ClientApp
-RUN npm ci --include=dev --no-audit --no-fund
+RUN npm install --include=dev --no-audit --no-fund
 
 COPY src/Quizmam.Api/ClientApp/ ./
 RUN npm run build
