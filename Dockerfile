@@ -1,7 +1,7 @@
 FROM node:22-bookworm-slim AS frontend-build
 WORKDIR /src
 
-COPY src/Quizmam.Api/ClientApp/package*.json ./src/Quizmam.Api/ClientApp/
+COPY src/Quizmam.Api/ClientApp/package*.json ./Quizmam.Api/ClientApp/
 WORKDIR /src/Quizmam.Api/ClientApp
 RUN npm install --include=dev --no-audit --no-fund
 
