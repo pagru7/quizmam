@@ -11,12 +11,10 @@ Thumbs.db
 **/obj/
 **/TestResults/
 
-# Frontend build/deps
+# Frontend build/deps (only if a Node-based frontend is added later)
 **/node_modules/
-src/Quizmam.Api/ClientApp/dist/
 
 # Runtime/generated assets
-src/Quizmam.Api/wwwroot/
 src/Quizmam.Api/publish-test/
 
 # SQLite/runtime data
@@ -24,6 +22,10 @@ src/Quizmam.Api/publish-test/
 *.db-shm
 *.db-wal
 /data/
+
+# Local scratch files
+cookies.txt
+tmp-playwright/
 
 # Logs
 *.log

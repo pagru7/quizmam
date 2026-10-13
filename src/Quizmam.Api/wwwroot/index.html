@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quizmam</title>
+    <link rel="stylesheet" href="/vendor/bootstrap.min.css" />
+    <link rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container-fluid px-4">
+        <div class="d-flex align-items-center justify-content-between gap-3">
+          <h1 class="app-title mb-0">Quizmam</h1>
+
+          <div class="d-flex align-items-center gap-3">
+            <div class="voice-picker-wrap">
+              <select id="voiceSelect" class="form-select form-select-sm" aria-label="Voice selection"></select>
+            </div>
+
+            <div id="userPanel" class="d-flex align-items-center gap-2"></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container py-4">
+      <div id="alertContainer"></div>
+
+      <section id="loginScreen" class="card auth-card mx-auto shadow-sm">
+        <div class="card-body p-4 p-md-5">
+          <h2 class="mb-3">Enter your name</h2>
+          <div class="mb-3">
+            <label for="nameInput" class="form-label">Name</label>
+            <input id="nameInput" class="form-control form-control-lg" list="knownUsers" placeholder="Type your name" />
+            <datalist id="knownUsers"></datalist>
+          </div>
+          <button id="continueButton" class="btn btn-primary btn-lg w-100">Continue</button>
+        </div>
+      </section>
+
+      <section id="appScreen" class="d-none">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+          <div class="btn-group" role="group" aria-label="Scope switch">
+            <button type="button" class="btn btn-light active-tab" data-scope="my">My collections</button>
+            <button type="button" class="btn btn-light" data-scope="all">All collections</button>
+          </div>
+
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <select id="problemLimitSelect" class="form-select form-select-sm">
+              <option value="10">10 problematic</option>
+              <option value="20">20 problematic</option>
+              <option value="30">30 problematic</option>
+            </select>
+            <button id="practiceProblematicButton" class="btn btn-outline-primary">Practice problematic</button>
+            <button id="newCollectionButton" class="btn btn-primary">New collection</button>
+          </div>
+        </div>
+
+        <div id="collectionsList" class="row g-3"></div>
+
+        <div class="card mt-4 shadow-sm">
+          <div class="card-body">
+            <h3 class="h5 mb-3">Top problematic words</h3>
+            <div id="problemWordsList"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal fade" id="collectionWizardModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Create collection</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <ul class="nav nav-tabs mb-3" id="wizardTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="wizard-step-0-tab" data-bs-toggle="tab" data-bs-target="#wizard-step-0" type="button" role="tab" aria-controls="wizard-step-0" aria-selected="true">Step 1: Metadata</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="wizard-step-1-tab" data-bs-toggle="tab" data-bs-target="#wizard-step-1" type="button" role="tab" aria-controls="wizard-step-1" aria-selected="false">Step 2: Word pairs</button>
+              </li>
+            </ul>
+
+            <div class="tab-content">
+              <div class="tab-pane fade show active" id="wizard-step-0" role="tabpanel" aria-labelledby="wizard-step-0-tab">
+                <div class="mb-3">
+                  <label for="collectionNameInput" class="form-label">Collection name</label>
+                  <input id="collectionNameInput" class="form-control" />
+                </div>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="sourceLanguageSelect" class="form-label">Source language</label>
+                    <select id="sourceLanguageSelect" class="form-select"></select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="targetLanguageSelect" class="form-label">Target language</label>
+                    <select id="targetLanguageSelect" class="form-select"></select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="wizard-step-1" role="tabpanel" aria-labelledby="wizard-step-1-tab">
+                <div id="wordPairsContainer" class="d-grid gap-3"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button id="wizardBackButton" type="button" class="btn btn-outline-primary">Back</button>
+            <button id="wizardNextButton" type="button" class="btn btn-primary">Next</button>
+            <button id="saveCollectionButton" class="btn btn-success d-none">Done</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="collectionDetailModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 id="collectionDetailTitle" class="modal-title"></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="practiceModeSelection" class="row g-3"></div>
+
+            <div id="practiceSection" class="d-none">
+              <div class="mb-3">
+                <label for="practiceDirectionSelect" class="form-label">Direction</label>
+                <select id="practiceDirectionSelect" class="form-select">
+                  <option value="source-to-target">Source → Target</option>
+                  <option value="target-to-source">Target → Source</option>
+                </select>
+              </div>
+
+              <div id="manualPracticeArea" class="d-none practice-panel"></div>
+              <div id="cardsPracticeArea" class="d-none practice-panel"></div>
+              <div id="testPracticeArea" class="d-none practice-panel"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" id="closeCollectionModalButton">Close</button>
+            <button type="button" class="btn btn-outline-primary" id="backToMenuButton">Back to menu</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="manualSummaryModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 id="manualSummaryTitle" class="modal-title">Congratulations!</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="manualSummaryBody"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/vendor/jquery-3.12.12.min.js"></script>
+    <script src="/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
+
