@@ -17,13 +17,4 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.12" />
   </ItemGroup>
 
-  <Target Name="BuildClientAppForPublish" BeforeTargets="Publish" Condition="'$(SkipClientBuild)' != 'true'">
-    <Exec WorkingDirectory="ClientApp" Command="npm ci" />
-    <Exec WorkingDirectory="ClientApp" Command="npm run build" />
-    <ItemGroup>
-      <ClientDistFiles Include="ClientApp\dist\**\*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(ClientDistFiles)" DestinationFolder="$(PublishDir)wwwroot\%(RecursiveDir)" />
-  </Target>
-
 </Project>
