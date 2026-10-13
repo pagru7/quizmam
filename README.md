@@ -2,36 +2,17 @@
 
 Quizmam is a local-network vocabulary learning app:
 - **Backend:** ASP.NET Core 10 + FastEndpoints + EF Core (SQLite)
-- **Frontend:** React + TypeScript + MUI
+- **Frontend:** static HTML + jQuery + Bootstrap 5
 - **Architecture:** Vertical Slice (`Features/<Feature>/<UseCase>`)
 
 ## Prerequisites
 
 - .NET SDK 10
-- Node.js 22+
-- npm 11+
-- Docker (for container deployment)
+- Docker (optional, for container deployment)
 
 ## Local Development
 
-1. Install frontend dependencies:
-
-```powershell
-cd src\Quizmam.Api\ClientApp
-npm install
-```
-
-2. Build frontend and copy static assets:
-
-```powershell
-npm run build
-cd ..\..
-Remove-Item -Recurse -Force src\Quizmam.Api\wwwroot -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Path src\Quizmam.Api\wwwroot | Out-Null
-Copy-Item -Recurse -Force src\Quizmam.Api\ClientApp\dist\* src\Quizmam.Api\wwwroot\
-```
-
-3. Run backend:
+Run the API locally:
 
 ```powershell
 cd src\Quizmam.Api
@@ -39,6 +20,13 @@ dotnet run
 ```
 
 App URL: `http://localhost:5128` (or the port shown by `dotnet run`)
+
+## Debugging in Visual Studio
+
+Open `Quizmam.slnx` in Visual Studio, set the `Quizmam.Api` project as the startup project, and press F5.
+
+For browser-side debugging, inspect the static frontend in `src/Quizmam.Api/wwwroot/index.html`, `app.js`, and `styles.css`.
+The app is served by the ASP.NET Core host, so the browser loads the static assets from the same process.
 
 ## Tests
 
