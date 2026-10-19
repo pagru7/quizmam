@@ -750,6 +750,11 @@ function renderManualPractice() {
 
   const promptText = state.direction === 'source-to-target' ? activeWord.sourceText : activeWord.targetText;
   const expectedText = state.direction === 'source-to-target' ? activeWord.targetText : activeWord.sourceText;
+  const displayText = getManualPracticeDisplayText(
+    promptText,
+    state.manualResult?.expectedText || expectedText,
+    Boolean(state.manualResult),
+  );
   const cardColor = state.manualResult ? getOutcomeColor(state.manualResult.outcome) : '#1f2937';
 
   let content = `
@@ -760,7 +765,7 @@ function renderManualPractice() {
         </button>
       </div>
 
-      <div class="practice-word-display" style="color: ${cardColor};">${escapeHtml(promptText)}</div>
+      <div class="practice-word-display" style="color: ${cardColor};">${escapeHtml(displayText)}</div>
 
       ${state.manualResult ? `
         <div class="manual-result-box mt-4">
