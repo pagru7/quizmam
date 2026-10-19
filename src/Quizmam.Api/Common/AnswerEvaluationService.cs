@@ -19,7 +19,9 @@ public static class AnswerEvaluationService
             return AnswerOutcome.Correct;
         }
 
-        return LevenshteinDistance(expected, entered) == 1 ? AnswerOutcome.Typo : AnswerOutcome.Wrong;
+        return LevenshteinDistance(expected, entered) == 1 
+            ? AnswerOutcome.Typo 
+            : AnswerOutcome.Wrong;
     }
 
     private static string Normalize(string value) => (value ?? string.Empty).Trim().ToLowerInvariant();
