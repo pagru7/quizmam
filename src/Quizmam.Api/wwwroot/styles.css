@@ -135,6 +135,28 @@ select {
   min-height: 220px;
 }
 
+.word-pairs-table-wrap {
+  max-height: 55vh;
+  overflow: auto;
+}
+
+.word-pairs-table {
+  min-width: 520px;
+}
+
+.word-pairs-table th,
+.word-pairs-table td {
+  padding: 0.35rem 0.5rem;
+}
+
+.word-pairs-table .pair-number-column,
+.word-pairs-table tbody th {
+  width: 3rem;
+  text-align: center;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .practice-word-display {
   font-size: clamp(2.4rem, 7vw, 5rem);
   line-height: 1.2;

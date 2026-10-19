@@ -106,7 +106,18 @@
               </div>
 
               <div class="tab-pane fade" id="wizard-step-1" role="tabpanel" aria-labelledby="wizard-step-1-tab">
-                <div id="wordPairsContainer" class="d-grid gap-3"></div>
+                <div class="table-responsive word-pairs-table-wrap">
+                  <table class="table table-sm align-middle word-pairs-table mb-0">
+                    <thead>
+                      <tr>
+                        <th class="pair-number-column" scope="col">#</th>
+                        <th id="sourceWordHeader" scope="col"></th>
+                        <th id="targetWordHeader" scope="col"></th>
+                      </tr>
+                    </thead>
+                    <tbody id="wordPairsContainer"></tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
@@ -169,7 +180,8 @@
 
     <script src="/vendor/jquery-3.12.12.min.js"></script>
     <script src="/vendor/bootstrap.bundle.min.js"></script>
+    <script src="/wizard-pairs.js"></script>
+    <script src="/manual-practice-display.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>
-

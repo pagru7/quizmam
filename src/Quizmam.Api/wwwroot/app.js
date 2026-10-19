@@ -435,16 +435,14 @@ function renderProblemWords() {
 }
 
 function openNewWizard() {
+  const languageDefaults = getDefaultLanguageIds(state.languages);
   state.wizard = {
     editingCollection: null,
     step: 0,
     name: '',
-    sourceLanguageId: '',
-    targetLanguageId: '',
-    pairs: [
-      { sourceText: '', targetText: '' },
-      { sourceText: '', targetText: '' },
-    ],
+    sourceLanguageId: languageDefaults.sourceLanguageId,
+    targetLanguageId: languageDefaults.targetLanguageId,
+    pairs: [{ sourceText: '', targetText: '' }],
   };
   renderLanguageSelects();
   renderWizard();
@@ -460,7 +458,7 @@ async function openEditWizard(id) {
       name: details.name,
       sourceLanguageId: details.sourceLanguageId,
       targetLanguageId: details.targetLanguageId,
-      pairs: details.pairs.length ? details.pairs.map((pair) => ({ sourceText: pair.sourceText, targetText: pair.targetText })) : [{ sourceText: '', targetText: '' }, { sourceText: '', targetText: '' }],
+      pairs: details.pairs.length ? details.pairs.map((pair) => ({ sourceText: pair.sourceText, targetText: pair.targetText })) : [{ sourceText: '', targetText: '' }],
     };
     renderLanguageSelects();
     renderWizard();
@@ -471,8 +469,11 @@ async function openEditWizard(id) {
 }
 
 function renderLanguageSelects() {
-  const sourceLanguageId = state.wizard.sourceLanguageId || state.languages[0]?.id || '';
-  const targetLanguageId = state.wizard.targetLanguageId || state.languages.find((x) => x.name === 'Angielski')?.id || state.languages[1]?.id || '';
+  const languageDefaults = getDefaultLanguageIds(state.languages);
+  const sourceLanguageId = state.wizard.sourceLanguageId || languageDefaults.sourceLanguageId;
+  const targetLanguageId = state.wizard.targetLanguageId
+    || state.languages.find((language) => language.id !== sourceLanguageId)?.id
+    || sourceLanguageId;
 
   state.wizard.sourceLanguageId = sourceLanguageId;
   state.wizard.targetLanguageId = targetLanguageId;
@@ -492,9 +493,11 @@ function renderLanguageSelects() {
 
   $('#sourceLanguageSelect').off('change').on('change', function () {
     state.wizard.sourceLanguageId = $(this).val();
+    updateWordPairLanguageHeaders();
   });
   $('#targetLanguageSelect').off('change').on('change', function () {
     state.wizard.targetLanguageId = $(this).val();
+    updateWordPairLanguageHeaders();
   });
 
   $('#collectionNameInput').val(state.wizard.name || '').off('input').on('input', function () {
@@ -509,36 +512,60 @@ function renderWizard() {
   $('#wizard-step-0').toggleClass('show active', step === 0);
   $('#wizard-step-1').toggleClass('show active', step === 1);
 
+  updateWordPairLanguageHeaders();
+
   const $pairs = $('#wordPairsContainer');
   $pairs.empty();
 
   state.wizard.pairs.forEach((pair, index) => {
-    const row = $(`
-      <div class="row g-2 pair-row" data-row-index="${index}">
-        <div class="col-md-6">
-          <label class="form-label">${escapeHtml(getLanguageLabel(state.wizard.sourceLanguageId, 'Source'))} #${index + 1}</label>
-          <input class="form-control pair-source-input" data-row-index="${index}" value="${escapeHtml(pair.sourceText)}" placeholder="Source word" />
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">${escapeHtml(getLanguageLabel(state.wizard.targetLanguageId, 'Target'))} #${index + 1}</label>
-          <input class="form-control pair-target-input" data-row-index="${index}" value="${escapeHtml(pair.targetText)}" placeholder="Translation" />
-        </div>
-      </div>
-    `);
-
-    row.find('.pair-source-input').on('input', function () {
-      updateWizardPair(index, 'sourceText', $(this).val());
-    });
-    row.find('.pair-target-input').on('input', function () {
-      updateWizardPair(index, 'targetText', $(this).val());
-    });
-    $pairs.append(row);
+    $pairs.append(createWizardPairRow(index));
   });
 
   $('#wizardBackButton').toggleClass('d-none', step === 0);
   $('#wizardNextButton').toggleClass('d-none', step === 1);
   $('#saveCollectionButton').toggleClass('d-none', step !== 1);
   $('#collectionWizardModal .modal-title').text(state.wizard.editingCollection ? 'Edit collection' : 'Create collection');
+}
+
+function updateWordPairLanguageHeaders() {
+  const sourceLanguage = getLanguageLabel(state.wizard.sourceLanguageId, 'Source');
+  const targetLanguage = getLanguageLabel(state.wizard.targetLanguageId, 'Target');
+  $('#sourceWordHeader').text(sourceLanguage);
+  $('#targetWordHeader').text(targetLanguage);
+
+  $('.pair-source-input').each(function () {
+    $(this).attr('aria-label', `${sourceLanguage} ${Number($(this).data('row-index')) + 1}`);
+  });
+  $('.pair-target-input').each(function () {
+    $(this).attr('aria-label', `${targetLanguage} ${Number($(this).data('row-index')) + 1}`);
+  });
+}
+
+function createWizardPairRow(index) {
+  const pair = state.wizard.pairs[index];
+  const rowNumber = index + 1;
+  const sourceLanguage = getLanguageLabel(state.wizard.sourceLanguageId, 'Source');
+  const targetLanguage = getLanguageLabel(state.wizard.targetLanguageId, 'Target');
+  const row = $(`
+    <tr class="pair-row" data-row-index="${index}">
+      <th scope="row">${rowNumber}</th>
+      <td>
+        <input class="form-control pair-source-input" data-row-index="${index}" aria-label="${escapeAttribute(`${sourceLanguage} ${rowNumber}`)}" value="${escapeAttribute(pair.sourceText)}" placeholder="Source word" />
+      </td>
+      <td>
+        <input class="form-control pair-target-input" data-row-index="${index}" aria-label="${escapeAttribute(`${targetLanguage} ${rowNumber}`)}" value="${escapeAttribute(pair.targetText)}" placeholder="Translation" />
+      </td>
+    </tr>
+  `);
+
+  row.find('.pair-source-input').on('input', function () {
+    updateWizardPair(index, 'sourceText', $(this).val());
+  });
+  row.find('.pair-target-input').on('input', function () {
+    updateWizardPair(index, 'targetText', $(this).val());
+  });
+
+  return row;
 }
 
 function getLanguageLabel(languageId, fallback) {
@@ -551,15 +578,17 @@ function updateWizardPair(index, field, value) {
   if (!item) return;
   item[field] = value;
 
-  const lastIndex = state.wizard.pairs.length - 1;
-  const lastPair = state.wizard.pairs[lastIndex];
-  if (index === lastIndex && lastPair.sourceText.trim() && lastPair.targetText.trim()) {
-    state.wizard.pairs.push({ sourceText: '', targetText: '' });
-    renderWizard();
+  if (completePairAndAppendBlank(state.wizard.pairs, index)) {
+    $('#wordPairsContainer').append(createWizardPairRow(state.wizard.pairs.length - 1));
   }
 }
 
 async function saveCollection() {
+  if (!hasDistinctLanguageIds(state.wizard.sourceLanguageId, state.wizard.targetLanguageId)) {
+    showError('Source and target languages must be different.');
+    return;
+  }
+
   const cleanPairs = state.wizard.pairs.filter((pair) => pair.sourceText.trim() && pair.targetText.trim());
 
   if (!state.wizard.name.trim()) {
@@ -750,6 +779,7 @@ function renderManualPractice() {
 
   const promptText = state.direction === 'source-to-target' ? activeWord.sourceText : activeWord.targetText;
   const expectedText = state.direction === 'source-to-target' ? activeWord.targetText : activeWord.sourceText;
+  const displayText = getManualPracticeDisplayText(promptText, state.manualResult, expectedText);
   const cardColor = state.manualResult ? getOutcomeColor(state.manualResult.outcome) : '#1f2937';
 
   let content = `
@@ -760,7 +790,7 @@ function renderManualPractice() {
         </button>
       </div>
 
-      <div class="practice-word-display" style="color: ${cardColor};">${escapeHtml(promptText)}</div>
+      <div class="practice-word-display" style="color: ${cardColor};">${escapeHtml(displayText)}</div>
 
       ${state.manualResult ? `
         <div class="manual-result-box mt-4">
