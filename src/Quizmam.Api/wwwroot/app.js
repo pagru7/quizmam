@@ -178,13 +178,10 @@ function bindUi() {
         return;
       }
 
-      if (event.code === 'Space' || event.key === ' ') {
-        event.preventDefault();
-        const card = $('#cardsPracticeCard');
-        if (card.length) {
-          const current = card.data('flipped') === true;
-          card.data('flipped', !current);
-          renderCardsPractice();
+      if (shouldFlipCardFromKey(event)) {
+        if ($('#cardsPracticeCard').length) {
+          event.preventDefault();
+          togglePracticeCard();
         }
       }
     }
@@ -857,11 +854,26 @@ function renderCardsPractice() {
   `;
 
   $('#cardsPracticeArea').html(content);
-  $('#cardsPracticeCard').on('click', function () {
-    const nextState = $(this).data('flipped') !== true;
-    $(this).data('flipped', nextState);
-    renderCardsPractice();
+  $('#cardsPracticeCard').on('click', togglePracticeCard);
+}
+
+function togglePracticeCard() {
+  const $card = $('#cardsPracticeCard');
+  if (!$card.length) return;
+
+  const isFlipped = $card.data('flipped') === true;
+  const nextFlipped = flipCard(isFlipped, () => {
+    const activeWord = getActiveWord();
+    if (!activeWord) return;
+
+    const translation = state.direction === 'source-to-target'
+      ? activeWord.targetText
+      : activeWord.sourceText;
+    speakWord(translation, getExpectedLanguageName());
   });
+
+  $card.data('flipped', nextFlipped);
+  renderCardsPractice();
 }
 
 function renderTestPractice() {
